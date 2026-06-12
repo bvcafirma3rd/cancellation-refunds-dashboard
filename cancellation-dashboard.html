@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cancellation & Refunds Dashboard — June 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f6fa;
+    color: #1a1a2e;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: white;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.3px; }
+  header .subtitle { font-size: 0.85rem; color: #a0aec0; margin-top: 4px; }
+  .badge {
+    background: #e53e3e;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  main { padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
+
+  /* KPI Cards */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-top: 4px solid;
+    display: flex;
+    flex-direction: column;
+  }
+  .kpi-card.combined { border-color: #4361ee; }
+  .kpi-card.followspy { border-color: #f77f00; }
+  .kpi-card.recentfollow { border-color: #06d6a0; }
+  .kpi-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: #718096; font-weight: 600; margin-bottom: 8px; }
+  .kpi-total { font-size: 2.8rem; font-weight: 800; line-height: 1; margin-bottom: 12px; }
+  .kpi-card.combined .kpi-total { color: #4361ee; }
+  .kpi-card.followspy .kpi-total { color: #f77f00; }
+  .kpi-card.recentfollow .kpi-total { color: #06d6a0; }
+  .kpi-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .pill.cancelled { background: #fff0f0; color: #c0392b; }
+  .pill.refunded { background: #fffbf0; color: #d35400; }
+  .pill.terminated { background: #f0f4ff; color: #2c3e50; }
+
+  /* Charts row */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1.8fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .chart-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #718096;
+    margin-bottom: 16px;
+  }
+  .chart-wrap { position: relative; height: 220px; }
+
+  /* Tables row */
+  .tables-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .table-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .table-card.full-width {
+    grid-column: 1 / -1;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  thead tr { border-bottom: 2px solid #edf2f7; }
+  thead th {
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #718096;
+    font-weight: 700;
+  }
+  thead th:not(:first-child) { text-align: right; }
+  tbody tr { border-bottom: 1px solid #f7fafc; }
+  tbody tr:hover { background: #f7fafc; }
+  tbody td { padding: 9px 10px; color: #2d3748; }
+  tbody td:not(:first-child) { text-align: right; }
+  tfoot tr { border-top: 2px solid #edf2f7; }
+  tfoot td {
+    padding: 10px 10px;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+  tfoot td:not(:first-child) { text-align: right; }
+  .zero { color: #cbd5e0; }
+
+  /* Status legend */
+  .legend { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #4a5568; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 0.75rem;
+    color: #a0aec0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .section-dot {
+    width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Cancellation &amp; Refunds Dashboard</h1>
+    <div class="subtitle">RF/FS Team · Pivot - Cancellation</div>
+  </div>
+  <div class="badge">June 2026</div>
+</header>
+
+<main>
+
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi-card combined">
+      <div class="kpi-label">Combined RF/FS</div>
+      <div class="kpi-total">62</div>
+      <div class="kpi-pills">
+        <span class="pill cancelled">48 Cancelled</span>
+        <span class="pill refunded">12 Refunded</span>
+        <span class="pill terminated">2 Terminated</span>
+      </div>
+    </div>
+    <div class="kpi-card followspy">
+      <div class="kpi-label">FollowSpy Only</div>
+      <div class="kpi-total">19</div>
+      <div class="kpi-pills">
+        <span class="pill cancelled">12 Cancelled</span>
+        <span class="pill refunded">6 Refunded</span>
+        <span class="pill terminated">1 Terminated</span>
+      </div>
+    </div>
+    <div class="kpi-card recentfollow">
+      <div class="kpi-label">RecentFollow Only</div>
+      <div class="kpi-total">43</div>
+      <div class="kpi-pills">
+        <span class="pill cancelled">36 Cancelled</span>
+        <span class="pill refunded">6 Refunded</span>
+        <span class="pill terminated">1 Terminated</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="card-title">Status Breakdown (Combined)</div>
+      <div class="chart-wrap">
+        <canvas id="statusChart"></canvas>
+      </div>
+      <div class="legend" style="margin-top:14px;">
+        <div class="legend-item"><div class="dot" style="background:#e53e3e"></div>Cancelled (48)</div>
+        <div class="legend-item"><div class="dot" style="background:#f6ad55"></div>Refunded (12)</div>
+        <div class="legend-item"><div class="dot" style="background:#4361ee"></div>Terminated (2)</div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="card-title">Cancellations by Plan (Combined)</div>
+      <div class="chart-wrap">
+        <canvas id="planChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- RF vs FS Comparison Bar -->
+  <div class="chart-card" style="margin-bottom:28px;">
+    <div class="card-title">FollowSpy vs RecentFollow — Status Comparison</div>
+    <div class="chart-wrap" style="height:200px;">
+      <canvas id="compChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Combined Table -->
+  <div class="table-card" style="margin-bottom:16px;">
+    <div class="section-header">
+      <div class="section-dot" style="background:#4361ee"></div>
+      <div class="card-title" style="margin-bottom:0">Combined RF/FS Refund/Cancellation</div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Plan</th>
+          <th>Cancelled</th>
+          <th>Refunded</th>
+          <th>Terminated</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Elite V1 Weekly</td><td>25</td><td>1</td><td class="zero">—</td><td><strong>26</strong></td></tr>
+        <tr><td>Elite V2 Monthly</td><td>1</td><td class="zero">—</td><td class="zero">—</td><td><strong>1</strong></td></tr>
+        <tr><td>Expert Quarterly</td><td class="zero">—</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
+        <tr><td>Expert Weekly</td><td>10</td><td>2</td><td class="zero">—</td><td><strong>12</strong></td></tr>
+        <tr><td>Premium Lifetime</td><td class="zero">—</td><td class="zero">—</td><td>1</td><td><strong>1</strong></td></tr>
+        <tr><td>Premium Quarterly</td><td class="zero">—</td><td>2</td><td class="zero">—</td><td><strong>2</strong></td></tr>
+        <tr><td>Premium Weekly</td><td>5</td><td class="zero">—</td><td class="zero">—</td><td><strong>5</strong></td></tr>
+        <tr><td>Starter Quarterly</td><td class="zero">—</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
+        <tr><td>Starter Weekly</td><td>7</td><td class="zero">—</td><td class="zero">—</td><td><strong>7</strong></td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td>Grand Total</td><td>48</td><td>12</td><td>2</td><td>62</td></tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- FollowSpy + RecentFollow Tables -->
+  <div class="tables-row">
+    <div class="table-card">
+      <div class="section-header">
+        <div class="section-dot" style="background:#f77f00"></div>
+        <div class="card-title" style="margin-bottom:0">FollowSpy Only</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Plan</th>
+            <th>Cancelled</th>
+            <th>Refunded</th>
+            <th>Terminated</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Premium Lifetime</td><td class="zero">—</td><td>1</td><td class="zero">—</td><td><strong>1</strong></td></tr>
+          <tr><td>Premium Quarterly</td><td class="zero">—</td><td>2</td><td class="zero">—</td><td><strong>2</strong></td></tr>
+          <tr><td>Premium Weekly</td><td>5</td><td class="zero">—</td><td class="zero">—</td><td><strong>5</strong></td></tr>
+          <tr><td>Starter Quarterly</td><td class="zero">—</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
+          <tr><td>Starter Weekly</td><td>7</td><td class="zero">—</td><td class="zero">—</td><td><strong>7</strong></td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>Grand Total</td><td>12</td><td>6</td><td>1</td><td>19</td></tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="table-card">
+      <div class="section-header">
+        <div class="section-dot" style="background:#06d6a0"></div>
+        <div class="card-title" style="margin-bottom:0">RecentFollow Only</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Plan</th>
+            <th>Cancelled</th>
+            <th>Refunded</th>
+            <th>Terminated</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Elite V1 Weekly</td><td>25</td><td>1</td><td class="zero">—</td><td><strong>26</strong></td></tr>
+          <tr><td>Elite V2 Monthly</td><td>1</td><td class="zero">—</td><td class="zero">—</td><td><strong>1</strong></td></tr>
+          <tr><td>Expert Quarterly</td><td class="zero">—</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
+          <tr><td>Expert Weekly</td><td>10</td><td>2</td><td class="zero">—</td><td><strong>12</strong></td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>Grand Total</td><td>36</td><td>6</td><td>1</td><td>43</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Data sourced from RF/FS TEAM · Pivot - Cancellation sheet &nbsp;·&nbsp; June 2026
+</footer>
+
+<script>
+// Status Donut Chart
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+new Chart(statusCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Cancelled', 'Refunded', 'Terminated'],
+    datasets: [{
+      data: [48, 12, 2],
+      backgroundColor: ['#e53e3e', '#f6ad55', '#4361ee'],
+      borderWidth: 3,
+      borderColor: '#fff',
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '68%',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/62*100)}%)`
+        }
+      }
+    }
+  }
+});
+
+// Plan Bar Chart
+const planCtx = document.getElementById('planChart').getContext('2d');
+new Chart(planCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Elite V1 Wkly', 'Expert Wkly', 'Starter Wkly', 'Starter Qrtly', 'Prem Wkly', 'Expert Qrtly', 'Prem Qrtly', 'Elite V2 Mo', 'Prem Life'],
+    datasets: [
+      {
+        label: 'Cancelled',
+        data: [25, 10, 7, 0, 5, 0, 0, 1, 0],
+        backgroundColor: '#e53e3e',
+        borderRadius: 4,
+      },
+      {
+        label: 'Refunded',
+        data: [1, 2, 0, 3, 0, 3, 2, 0, 0],
+        backgroundColor: '#f6ad55',
+        borderRadius: 4,
+      },
+      {
+        label: 'Terminated',
+        data: [0, 0, 0, 1, 0, 1, 0, 0, 1],
+        backgroundColor: '#4361ee',
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: { boxWidth: 12, font: { size: 11 }, padding: 10 }
+      }
+    },
+    scales: {
+      x: {
+        stacked: true,
+        grid: { display: false },
+        ticks: { font: { size: 10 } }
+      },
+      y: {
+        stacked: true,
+        grid: { color: '#f0f0f0' },
+        ticks: { font: { size: 11 }, stepSize: 5 }
+      }
+    }
+  }
+});
+
+// Comparison Chart
+const compCtx = document.getElementById('compChart').getContext('2d');
+new Chart(compCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Cancelled', 'Refunded', 'Terminated'],
+    datasets: [
+      {
+        label: 'FollowSpy',
+        data: [12, 6, 1],
+        backgroundColor: '#f77f00',
+        borderRadius: 4,
+      },
+      {
+        label: 'RecentFollow',
+        data: [36, 6, 1],
+        backgroundColor: '#06d6a0',
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: { boxWidth: 12, font: { size: 11 }, padding: 12 }
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 12 } } },
+      y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 11 }, stepSize: 10 } }
+    }
+  }
+});
+</script>
+</body>
+</html>
