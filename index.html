@@ -221,17 +221,11 @@ function computeTotals(from, to) {
   var selStart  = new Date(from + 'T00:00:00');
   var selEnd    = new Date(to   + 'T00:00:00');
   if (selEnd < dataStart || selStart > dataEnd) return null;
-  var overlapStart = selStart < dataStart ? dataStart : selStart;
-  var overlapEnd   = selEnd   > dataEnd   ? dataEnd   : selEnd;
-  var overlapDays  = Math.round((overlapEnd - overlapStart) / 86400000) + 1;
-  var totalDays    = Math.round((dataEnd - dataStart) / 86400000) + 1;
-  var ratio = overlapDays / totalDays;
-  var scale = function(v) { return Math.round(v * ratio); };
   return {
-    combined:    { cancelled: scale(FULL.combined.cancelled),    refunded: scale(FULL.combined.refunded),    terminated: scale(FULL.combined.terminated) },
-    followspy:   { cancelled: scale(FULL.followspy.cancelled),   refunded: scale(FULL.followspy.refunded),   terminated: scale(FULL.followspy.terminated) },
-    recentfollow:{ cancelled: scale(FULL.recentfollow.cancelled),refunded: scale(FULL.recentfollow.refunded),terminated: scale(FULL.recentfollow.terminated) },
-    ratio: ratio
+    combined:    { cancelled: FULL.combined.cancelled,    refunded: FULL.combined.refunded,    terminated: FULL.combined.terminated },
+    followspy:   { cancelled: FULL.followspy.cancelled,   refunded: FULL.followspy.refunded,   terminated: FULL.followspy.terminated },
+    recentfollow:{ cancelled: FULL.recentfollow.cancelled,refunded: FULL.recentfollow.refunded,terminated: FULL.recentfollow.terminated },
+    ratio: 1
   };
 }
 
