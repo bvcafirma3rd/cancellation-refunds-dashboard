@@ -313,6 +313,16 @@ function applyDateRange() {
     });
     document.getElementById('periodLabel').innerHTML = 'Showing: <span>No data</span>';
     document.getElementById('footerPeriod').textContent = 'No data for selected range';
+    statusChart.data.datasets[0].data = [0, 0, 0]; statusChart.update();
+    planChart.data.datasets[0].data = PLAN_DATA.map(function(){ return 0; });
+    planChart.data.datasets[1].data = PLAN_DATA.map(function(){ return 0; });
+    planChart.data.datasets[2].data = PLAN_DATA.map(function(){ return 0; });
+    planChart.update();
+    compChart.data.datasets[0].data = [0, 0, 0];
+    compChart.data.datasets[1].data = [0, 0, 0]; compChart.update();
+    document.getElementById('legendCancelled').textContent = 'Cancelled (0)';
+    document.getElementById('legendRefunded').textContent  = 'Refunded (0)';
+    document.getElementById('legendTerminated').textContent= 'Terminated (0)';
     return;
   }
 
