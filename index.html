@@ -3,188 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cancellation & Refunds Dashboard</title>
+<title>Cancellation &amp; Refunds Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 <style>
   :root { color-scheme: light; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f5f6fa;
-    color: #1a1a2e;
-    min-height: 100vh;
-  }
-
-  header {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    color: white;
-    padding: 20px 32px 0;
-  }
-  .header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f6fa; color: #1a1a2e; min-height: 100vh; }
+  header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 20px 32px 0; }
+  .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
   header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.3px; }
   header .subtitle { font-size: 0.85rem; color: #a0aec0; margin-top: 4px; }
-
-  /* Date range bar */
-  .date-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(255,255,255,0.07);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    padding: 14px 0;
-    flex-wrap: wrap;
-  }
-  .date-bar label {
-    font-size: 0.75rem;
-    color: #a0aec0;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .date-bar input[type="date"] {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px;
-    color: white;
-    padding: 7px 12px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    outline: none;
-    transition: border-color 0.15s;
-    color-scheme: dark;
-  }
-  .date-bar input[type="date"]:hover,
-  .date-bar input[type="date"]:focus {
-    border-color: rgba(255,255,255,0.45);
-    background: rgba(255,255,255,0.15);
-  }
-  .date-bar .sep {
-    color: #718096;
-    font-size: 0.8rem;
-  }
-  .apply-btn {
-    background: #4361ee;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 7px 18px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    white-space: nowrap;
-  }
+  .date-bar { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.07); border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 0; flex-wrap: wrap; }
+  .date-bar label { font-size: 0.75rem; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; white-space: nowrap; }
+  .date-bar input[type="date"] { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; padding: 7px 12px; font-size: 0.85rem; cursor: pointer; outline: none; color-scheme: dark; }
+  .date-bar input[type="date"]:hover, .date-bar input[type="date"]:focus { border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.15); }
+  .date-bar .sep { color: #718096; font-size: 0.8rem; }
+  .apply-btn { background: #4361ee; color: white; border: none; border-radius: 8px; padding: 7px 18px; font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
   .apply-btn:hover { background: #3451d1; }
-  .apply-btn:active { transform: scale(0.97); }
-  .reset-btn {
-    background: transparent;
-    color: #a0aec0;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 8px;
-    padding: 7px 14px;
-    font-size: 0.82rem;
-    cursor: pointer;
-    transition: color 0.15s, border-color 0.15s;
-    white-space: nowrap;
-  }
+  .reset-btn { background: transparent; color: #a0aec0; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; cursor: pointer; white-space: nowrap; }
   .reset-btn:hover { color: white; border-color: rgba(255,255,255,0.35); }
-
-  /* Period label */
-  .period-label {
-    margin-left: auto;
-    background: rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 5px 14px;
-    font-size: 0.75rem;
-    color: #e2e8f0;
-    font-weight: 500;
-    white-space: nowrap;
-  }
+  .period-label { margin-left: auto; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; color: #e2e8f0; font-weight: 500; white-space: nowrap; }
   .period-label span { color: #90cdf4; font-weight: 700; }
-
   main { padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
-
-  /* KPI Cards */
-  .kpi-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 28px;
-  }
-  .kpi-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px 24px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    border-top: 4px solid;
-    display: flex;
-    flex-direction: column;
-  }
-  .kpi-card.combined { border-color: #4361ee; }
-  .kpi-card.followspy { border-color: #f77f00; }
-  .kpi-card.recentfollow { border-color: #06d6a0; }
+  .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+  .kpi-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-top: 4px solid; display: flex; flex-direction: column; }
+  .kpi-card.combined { border-color: #4361ee; } .kpi-card.followspy { border-color: #f77f00; } .kpi-card.recentfollow { border-color: #06d6a0; }
   .kpi-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: #718096; font-weight: 600; margin-bottom: 8px; }
   .kpi-total { font-size: 2.8rem; font-weight: 800; line-height: 1; margin-bottom: 12px; }
-  .kpi-card.combined .kpi-total { color: #4361ee; }
-  .kpi-card.followspy .kpi-total { color: #f77f00; }
-  .kpi-card.recentfollow .kpi-total { color: #06d6a0; }
+  .kpi-card.combined .kpi-total { color: #4361ee; } .kpi-card.followspy .kpi-total { color: #f77f00; } .kpi-card.recentfollow .kpi-total { color: #06d6a0; }
   .kpi-pills { display: flex; gap: 8px; flex-wrap: wrap; }
   .pill { font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .pill.cancelled { background: #fff0f0; color: #c0392b; }
-  .pill.refunded { background: #fffbf0; color: #d35400; }
-  .pill.terminated { background: #f0f4ff; color: #2c3e50; }
-
-  /* Charts row */
+  .pill.cancelled { background: #fff0f0; color: #c0392b; } .pill.refunded { background: #fffbf0; color: #d35400; } .pill.terminated { background: #f0f4ff; color: #2c3e50; }
   .charts-row { display: grid; grid-template-columns: 1fr 1.8fr; gap: 16px; margin-bottom: 28px; }
   .chart-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
   .card-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #718096; margin-bottom: 16px; }
   .chart-wrap { position: relative; height: 220px; }
-
-  /* Tables */
   .tables-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
   .table-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
   table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
   thead tr { border-bottom: 2px solid #edf2f7; }
   thead th { text-align: left; padding: 8px 10px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px; color: #718096; font-weight: 700; }
   thead th:not(:first-child) { text-align: right; }
-  tbody tr { border-bottom: 1px solid #f7fafc; }
-  tbody tr:hover { background: #f7fafc; }
-  tbody td { padding: 9px 10px; color: #2d3748; }
-  tbody td:not(:first-child) { text-align: right; }
-  tfoot tr { border-top: 2px solid #edf2f7; }
-  tfoot td { padding: 10px 10px; font-weight: 700; color: #1a1a2e; }
-  tfoot td:not(:first-child) { text-align: right; }
+  tbody tr { border-bottom: 1px solid #f7fafc; } tbody tr:hover { background: #f7fafc; }
+  tbody td { padding: 9px 10px; color: #2d3748; } tbody td:not(:first-child) { text-align: right; }
+  tfoot tr { border-top: 2px solid #edf2f7; } tfoot td { padding: 10px 10px; font-weight: 700; color: #1a1a2e; } tfoot td:not(:first-child) { text-align: right; }
   .zero { color: #cbd5e0; }
-
   .legend { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #4a5568; }
   .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-
   .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
   .section-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-
   footer { text-align: center; padding: 16px; font-size: 0.75rem; color: #a0aec0; }
-
-  /* No-data notice */
-  .no-data {
-    display: none;
-    text-align: center;
-    padding: 48px 24px;
-    color: #718096;
-  }
+  .no-data { display: none; text-align: center; padding: 48px 24px; color: #718096; }
   .no-data .icon { font-size: 2.5rem; margin-bottom: 12px; }
   .no-data p { font-size: 0.95rem; }
   .no-data small { font-size: 0.8rem; color: #a0aec0; margin-top: 6px; display: block; }
 </style>
 </head>
 <body>
-
 <header>
   <div class="header-top">
     <div>
@@ -192,7 +68,6 @@
       <div class="subtitle">RF/FS Team &middot; Pivot - Cancellation</div>
     </div>
   </div>
-
   <div class="date-bar">
     <label>From</label>
     <input type="date" id="dateFrom" value="2026-06-01">
@@ -204,10 +79,7 @@
     <div class="period-label" id="periodLabel">Showing: <span>June 2026</span></div>
   </div>
 </header>
-
 <main id="mainContent">
-
-  <!-- KPI Row -->
   <div class="kpi-row">
     <div class="kpi-card combined">
       <div class="kpi-label">Combined RF/FS</div>
@@ -237,16 +109,14 @@
       </div>
     </div>
   </div>
-
-  <!-- Charts Row -->
   <div class="charts-row">
     <div class="chart-card">
       <div class="card-title">Status Breakdown (Combined)</div>
       <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
       <div class="legend" style="margin-top:14px;">
-        <div class="legend-item"><div class="dot" style="background:#e53e3e"></div>Cancelled (48)</div>
-        <div class="legend-item"><div class="dot" style="background:#f6ad55"></div>Refunded (12)</div>
-        <div class="legend-item"><div class="dot" style="background:#4361ee"></div>Terminated (2)</div>
+        <div class="legend-item"><div class="dot" style="background:#e53e3e"></div><span id="legendCancelled">Cancelled (48)</span></div>
+        <div class="legend-item"><div class="dot" style="background:#f6ad55"></div><span id="legendRefunded">Refunded (12)</span></div>
+        <div class="legend-item"><div class="dot" style="background:#4361ee"></div><span id="legendTerminated">Terminated (2)</span></div>
       </div>
     </div>
     <div class="chart-card">
@@ -254,84 +124,258 @@
       <div class="chart-wrap"><canvas id="planChart"></canvas></div>
     </div>
   </div>
-
-  <!-- Comparison -->
   <div class="chart-card" style="margin-bottom:28px;">
-    <div class="card-title">FollowSpy vs RecentFollow — Status Comparison</div>
+    <div class="card-title">FollowSpy vs RecentFollow &mdash; Status Comparison</div>
     <div class="chart-wrap" style="height:200px;"><canvas id="compChart"></canvas></div>
   </div>
-
-  <!-- Combined Table -->
-  <div class="table-card" style="margin-bottom:16px;">
-    <div class="section-header">
-      <div class="section-dot" style="background:#4361ee"></div>
-      <div class="card-title" style="margin-bottom:0">Combined RF/FS Refund/Cancellation</div>
-    </div>
-    <table>
-      <thead><tr><th>Plan</th><th>Cancelled</th><th>Refunded</th><th>Terminated</th><th>Total</th></tr></thead>
-      <tbody>
-        <tr><td>Elite V1 Weekly</td><td>25</td><td>1</td><td class="zero">—</td><td><strong>26</strong></td></tr>
-        <tr><td>Elite V2 Monthly</td><td>1</td><td class="zero">—</td><td class="zero">—</td><td><strong>1</strong></td></tr>
-        <tr><td>Expert Quarterly</td><td class="zero">—</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
-        <tr><td>Expert Weekly</td><td>10</td><td>2</td><td class="zero">—</td><td><strong>12</strong></td></tr>
-        <tr><td>Premium Lifetime</td><td class="zero">—</td><td class="zero">—</td><td>1</td><td><strong>1</strong></td></tr>
-        <tr><td>Premium Quarterly</td><td class="zero">—</td><td>2</td><td class="zero">—</td><td><strong>2</strong></td></tr>
-        <tr><td>Premium Weekly</td><td>5</td><td class="zero">—</td><td class="zero">—</td><td><strong>5</strong></td></tr>
-        <tr><td>Starter Quarterly</td><td class="zero">—</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
-        <tr><td>Starter Weekly</td><td>7</td><td class="zero">—</td><td class="zero">—</td><td><strong>7</strong></td></tr>
-      </tbody>
-      <tfoot><tr><td>Grand Total</td><td>48</td><td>12</td><td>2</td><td>62</td></tr></tfoot>
-    </table>
+  <div class="no-data" id="noDataNotice">
+    <div class="icon">&#128235;</div>
+    <p>No data available for selected range</p>
+    <small>Data is available for June 2026. Please select a date within that period.</small>
   </div>
-
-  <!-- FollowSpy + RecentFollow Tables -->
-  <div class="tables-row">
-    <div class="table-card">
+  <div id="tablesSection">
+    <div class="table-card" style="margin-bottom:16px;">
       <div class="section-header">
-        <div class="section-dot" style="background:#f77f00"></div>
-        <div class="card-title" style="margin-bottom:0">FollowSpy Only</div>
+        <div class="section-dot" style="background:#4361ee"></div>
+        <div class="card-title" style="margin-bottom:0">Combined RF/FS Refund/Cancellation</div>
       </div>
       <table>
         <thead><tr><th>Plan</th><th>Cancelled</th><th>Refunded</th><th>Terminated</th><th>Total</th></tr></thead>
         <tbody>
-          <tr><td>Premium Lifetime</td><td class="zero">—</td><td>1</td><td class="zero">—</td><td><strong>1</strong></td></tr>
-          <tr><td>Premium Quarterly</td><td class="zero">—</td><td>2</td><td class="zero">—</td><td><strong>2</strong></td></tr>
-          <tr><td>Premium Weekly</td><td>5</td><td class="zero">—</td><td class="zero">—</td><td><strong>5</strong></td></tr>
-          <tr><td>Starter Quarterly</td><td class="zero">—</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
-          <tr><td>Starter Weekly</td><td>7</td><td class="zero">—</td><td class="zero">—</td><td><strong>7</strong></td></tr>
+          <tr><td>Elite V1 Weekly</td><td>25</td><td>1</td><td class="zero">&#8212;</td><td><strong>26</strong></td></tr>
+          <tr><td>Elite V2 Monthly</td><td>1</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>1</strong></td></tr>
+          <tr><td>Expert Quarterly</td><td class="zero">&#8212;</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
+          <tr><td>Expert Weekly</td><td>10</td><td>2</td><td class="zero">&#8212;</td><td><strong>12</strong></td></tr>
+          <tr><td>Premium Lifetime</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td>1</td><td><strong>1</strong></td></tr>
+          <tr><td>Premium Quarterly</td><td class="zero">&#8212;</td><td>2</td><td class="zero">&#8212;</td><td><strong>2</strong></td></tr>
+          <tr><td>Premium Weekly</td><td>5</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>5</strong></td></tr>
+          <tr><td>Starter Quarterly</td><td class="zero">&#8212;</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
+          <tr><td>Starter Weekly</td><td>7</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>7</strong></td></tr>
         </tbody>
-        <tfoot><tr><td>Grand Total</td><td>12</td><td>6</td><td>1</td><td>19</td></tr></tfoot>
+        <tfoot><tr><td>Grand Total</td><td id="ftCancelledCombined">48</td><td id="ftRefundedCombined">12</td><td id="ftTerminatedCombined">2</td><td id="ftTotalCombined">62</td></tr></tfoot>
       </table>
     </div>
-    <div class="table-card">
-      <div class="section-header">
-        <div class="section-dot" style="background:#06d6a0"></div>
-        <div class="card-title" style="margin-bottom:0">RecentFollow Only</div>
+    <div class="tables-row">
+      <div class="table-card">
+        <div class="section-header">
+          <div class="section-dot" style="background:#f77f00"></div>
+          <div class="card-title" style="margin-bottom:0">FollowSpy Only</div>
+        </div>
+        <table>
+          <thead><tr><th>Plan</th><th>Cancelled</th><th>Refunded</th><th>Terminated</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr><td>Premium Lifetime</td><td class="zero">&#8212;</td><td>1</td><td class="zero">&#8212;</td><td><strong>1</strong></td></tr>
+            <tr><td>Premium Quarterly</td><td class="zero">&#8212;</td><td>2</td><td class="zero">&#8212;</td><td><strong>2</strong></td></tr>
+            <tr><td>Premium Weekly</td><td>5</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>5</strong></td></tr>
+            <tr><td>Starter Quarterly</td><td class="zero">&#8212;</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
+            <tr><td>Starter Weekly</td><td>7</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>7</strong></td></tr>
+          </tbody>
+          <tfoot><tr><td>Grand Total</td><td id="ftCancelledFS">12</td><td id="ftRefundedFS">6</td><td id="ftTerminatedFS">1</td><td id="ftTotalFS">19</td></tr></tfoot>
+        </table>
       </div>
-      <table>
-        <thead><tr><th>Plan</th><th>Cancelled</th><th>Refunded</th><th>Terminated</th><th>Total</th></tr></thead>
-        <tbody>
-          <tr><td>Elite V1 Weekly</td><td>25</td><td>1</td><td class="zero">—</td><td><strong>26</strong></td></tr>
-          <tr><td>Elite V2 Monthly</td><td>1</td><td class="zero">—</td><td class="zero">—</td><td><strong>1</strong></td></tr>
-          <tr><td>Expert Quarterly</td><td class="zero">—</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
-          <tr><td>Expert Weekly</td><td>10</td><td>2</td><td class="zero">—</td><td><strong>12</strong></td></tr>
-        </tbody>
-        <tfoot><tr><td>Grand Total</td><td>36</td><td>6</td><td>1</td><td>43</td></tr></tfoot>
-      </table>
+      <div class="table-card">
+        <div class="section-header">
+          <div class="section-dot" style="background:#06d6a0"></div>
+          <div class="card-title" style="margin-bottom:0">RecentFollow Only</div>
+        </div>
+        <table>
+          <thead><tr><th>Plan</th><th>Cancelled</th><th>Refunded</th><th>Terminated</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr><td>Elite V1 Weekly</td><td>25</td><td>1</td><td class="zero">&#8212;</td><td><strong>26</strong></td></tr>
+            <tr><td>Elite V2 Monthly</td><td>1</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>1</strong></td></tr>
+            <tr><td>Expert Quarterly</td><td class="zero">&#8212;</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
+            <tr><td>Expert Weekly</td><td>10</td><td>2</td><td class="zero">&#8212;</td><td><strong>12</strong></td></tr>
+          </tbody>
+          <tfoot><tr><td>Grand Total</td><td id="ftCancelledRF">36</td><td id="ftRefundedRF">6</td><td id="ftTerminatedRF">1</td><td id="ftTotalRF">43</td></tr></tfoot>
+        </table>
+      </div>
     </div>
   </div>
-
 </main>
-
 <footer>
   Data sourced from RF/FS TEAM &middot; Pivot - Cancellation sheet &nbsp;&middot;&nbsp; <span id="footerPeriod">June 2026</span>
 </footer>
-
 <script>
-// ── Data store ──────────────────────────────────────────────────────────────
-// Each entry represents a daily record. Currently all records are for June 2026.
-// When the Monday scheduler updates the dashboard it can add new month entries.
-const RAW_DATA = [
-  // June 2026 — full month totals spread as daily records for filtering
-  // Format: { date, product, plan, status, count }
-  ...generateMonthRecords('2026-06-01', '2026-0
+const FULL_START = '2026-06-01';
+const FULL_END   = '2026-06-30';
+const FULL = {
+  combined:    { cancelled: 48, refunded: 12, terminated: 2 },
+  followspy:   { cancelled: 12, refunded:  6, terminated: 1 },
+  recentfollow:{ cancelled: 36, refunded:  6, terminated: 1 }
+};
+const PLAN_DATA = [
+  { plan: 'Elite V1 Wkly', cancelled: 25, refunded: 1, terminated: 0 },
+  { plan: 'Expert Wkly',   cancelled: 10, refunded: 2, terminated: 0 },
+  { plan: 'Starter Wkly',  cancelled:  7, refunded: 0, terminated: 0 },
+  { plan: 'Starter Qrtly', cancelled:  0, refunded: 3, terminated: 1 },
+  { plan: 'Prem Wkly',     cancelled:  5, refunded: 0, terminated: 0 },
+  { plan: 'Expert Qrtly',  cancelled:  0, refunded: 3, terminated: 1 },
+  { plan: 'Prem Qrtly',    cancelled:  0, refunded: 2, terminated: 0 },
+  { plan: 'Elite V2 Mo',   cancelled:  1, refunded: 0, terminated: 0 },
+  { plan: 'Prem Life',     cancelled:  0, refunded: 0, terminated: 1 },
+];
+
+function computeTotals(from, to) {
+  var dataStart = new Date(FULL_START + 'T00:00:00');
+  var dataEnd   = new Date(FULL_END   + 'T00:00:00');
+  var selStart  = new Date(from + 'T00:00:00');
+  var selEnd    = new Date(to   + 'T00:00:00');
+  if (selEnd < dataStart || selStart > dataEnd) return null;
+  var overlapStart = selStart < dataStart ? dataStart : selStart;
+  var overlapEnd   = selEnd   > dataEnd   ? dataEnd   : selEnd;
+  var overlapDays  = Math.round((overlapEnd - overlapStart) / 86400000) + 1;
+  var totalDays    = Math.round((dataEnd - dataStart) / 86400000) + 1;
+  var ratio = overlapDays / totalDays;
+  var scale = function(v) { return Math.round(v * ratio); };
+  return {
+    combined:    { cancelled: scale(FULL.combined.cancelled),    refunded: scale(FULL.combined.refunded),    terminated: scale(FULL.combined.terminated) },
+    followspy:   { cancelled: scale(FULL.followspy.cancelled),   refunded: scale(FULL.followspy.refunded),   terminated: scale(FULL.followspy.terminated) },
+    recentfollow:{ cancelled: scale(FULL.recentfollow.cancelled),refunded: scale(FULL.recentfollow.refunded),terminated: scale(FULL.recentfollow.terminated) },
+    ratio: ratio
+  };
+}
+
+function formatPeriod(from, to) {
+  var f = new Date(from + 'T00:00:00');
+  var t = new Date(to   + 'T00:00:00');
+  if (f.getMonth() === t.getMonth() && f.getFullYear() === t.getFullYear()) {
+    if (f.getDate() === 1 && t.getDate() >= 28) return f.toLocaleString('default', { month: 'long', year: 'numeric' });
+    return f.toLocaleString('default',{month:'short',day:'numeric'}) + ' - ' + t.toLocaleString('default',{month:'short',day:'numeric',year:'numeric'});
+  }
+  return f.toLocaleString('default',{month:'short',year:'numeric'}) + ' - ' + t.toLocaleString('default',{month:'short',year:'numeric'});
+}
+
+var statusChart, planChart, compChart;
+
+function initCharts() {
+  statusChart = new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Cancelled','Refunded','Terminated'],
+      datasets: [{ data: [48,12,2], backgroundColor: ['#e53e3e','#f6ad55','#4361ee'], borderWidth: 0, hoverOffset: 6 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+  });
+
+  planChart = new Chart(document.getElementById('planChart'), {
+    type: 'bar',
+    data: {
+      labels: PLAN_DATA.map(function(d){ return d.plan; }),
+      datasets: [
+        { label: 'Cancelled',  data: PLAN_DATA.map(function(d){ return d.cancelled; }),  backgroundColor: '#e53e3e' },
+        { label: 'Refunded',   data: PLAN_DATA.map(function(d){ return d.refunded; }),   backgroundColor: '#f6ad55' },
+        { label: 'Terminated', data: PLAN_DATA.map(function(d){ return d.terminated; }), backgroundColor: '#4361ee' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
+      scales: { x: { stacked: true, ticks: { font: { size: 10 } } }, y: { stacked: true, beginAtZero: true } }
+    }
+  });
+
+  compChart = new Chart(document.getElementById('compChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Cancelled','Refunded','Terminated'],
+      datasets: [
+        { label: 'FollowSpy',    data: [12,6,1], backgroundColor: '#f77f00' },
+        { label: 'RecentFollow', data: [36,6,1], backgroundColor: '#06d6a0' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
+      scales: { x: { ticks: { font: { size: 11 } } }, y: { beginAtZero: true } }
+    }
+  });
+}
+
+function applyDateRange() {
+  var from = document.getElementById('dateFrom').value;
+  var to   = document.getElementById('dateTo').value;
+  if (!from || !to || from > to) { alert('Please select a valid date range.'); return; }
+
+  var totals = computeTotals(from, to);
+  var noData = document.getElementById('noDataNotice');
+  var tables = document.getElementById('tablesSection');
+
+  if (!totals) {
+    noData.style.display = 'block';
+    tables.style.display = 'none';
+    document.getElementById('kpiCombined').textContent     = '0';
+    document.getElementById('kpiFollowspy').textContent    = '0';
+    document.getElementById('kpiRecentfollow').textContent = '0';
+    ['Combined','FS','RF'].forEach(function(s) {
+      document.getElementById('pillCancelled'+s).textContent  = '0 Cancelled';
+      document.getElementById('pillRefunded'+s).textContent   = '0 Refunded';
+      document.getElementById('pillTerminated'+s).textContent = '0 Terminated';
+    });
+    document.getElementById('periodLabel').innerHTML = 'Showing: <span>No data</span>';
+    document.getElementById('footerPeriod').textContent = 'No data for selected range';
+    return;
+  }
+
+  noData.style.display = 'none';
+  tables.style.display = '';
+
+  var c = totals.combined, f = totals.followspy, r = totals.recentfollow, ratio = totals.ratio;
+
+  document.getElementById('kpiCombined').textContent     = c.cancelled + c.refunded + c.terminated;
+  document.getElementById('kpiFollowspy').textContent    = f.cancelled + f.refunded + f.terminated;
+  document.getElementById('kpiRecentfollow').textContent = r.cancelled + r.refunded + r.terminated;
+
+  document.getElementById('pillCancelledCombined').textContent  = c.cancelled  + ' Cancelled';
+  document.getElementById('pillRefundedCombined').textContent   = c.refunded   + ' Refunded';
+  document.getElementById('pillTerminatedCombined').textContent = c.terminated + ' Terminated';
+  document.getElementById('pillCancelledFS').textContent        = f.cancelled  + ' Cancelled';
+  document.getElementById('pillRefundedFS').textContent         = f.refunded   + ' Refunded';
+  document.getElementById('pillTerminatedFS').textContent       = f.terminated + ' Terminated';
+  document.getElementById('pillCancelledRF').textContent        = r.cancelled  + ' Cancelled';
+  document.getElementById('pillRefundedRF').textContent         = r.refunded   + ' Refunded';
+  document.getElementById('pillTerminatedRF').textContent       = r.terminated + ' Terminated';
+
+  document.getElementById('ftCancelledCombined').textContent  = c.cancelled;
+  document.getElementById('ftRefundedCombined').textContent   = c.refunded;
+  document.getElementById('ftTerminatedCombined').textContent = c.terminated;
+  document.getElementById('ftTotalCombined').textContent      = c.cancelled + c.refunded + c.terminated;
+  document.getElementById('ftCancelledFS').textContent  = f.cancelled;
+  document.getElementById('ftRefundedFS').textContent   = f.refunded;
+  document.getElementById('ftTerminatedFS').textContent = f.terminated;
+  document.getElementById('ftTotalFS').textContent      = f.cancelled + f.refunded + f.terminated;
+  document.getElementById('ftCancelledRF').textContent  = r.cancelled;
+  document.getElementById('ftRefundedRF').textContent   = r.refunded;
+  document.getElementById('ftTerminatedRF').textContent = r.terminated;
+  document.getElementById('ftTotalRF').textContent      = r.cancelled + r.refunded + r.terminated;
+
+  statusChart.data.datasets[0].data = [c.cancelled, c.refunded, c.terminated];
+  statusChart.update();
+
+  planChart.data.datasets[0].data = PLAN_DATA.map(function(d){ return Math.round(d.cancelled * ratio); });
+  planChart.data.datasets[1].data = PLAN_DATA.map(function(d){ return Math.round(d.refunded  * ratio); });
+  planChart.data.datasets[2].data = PLAN_DATA.map(function(d){ return Math.round(d.terminated* ratio); });
+  planChart.update();
+
+  compChart.data.datasets[0].data = [f.cancelled, f.refunded, f.terminated];
+  compChart.data.datasets[1].data = [r.cancelled, r.refunded, r.terminated];
+  compChart.update();
+
+  document.getElementById('legendCancelled').textContent = 'Cancelled (' + c.cancelled + ')';
+  document.getElementById('legendRefunded').textContent  = 'Refunded ('  + c.refunded  + ')';
+  document.getElementById('legendTerminated').textContent= 'Terminated (' + c.terminated + ')';
+
+  var label = formatPeriod(from, to);
+  document.getElementById('periodLabel').innerHTML = 'Showing: <span>' + label + '</span>';
+  document.getElementById('footerPeriod').textContent = label;
+}
+
+function resetDateRange() {
+  document.getElementById('dateFrom').value = FULL_START;
+  document.getElementById('dateTo').value   = FULL_END;
+  applyDateRange();
+}
+
+initCharts();
+</script>
+</body>
+</html>
