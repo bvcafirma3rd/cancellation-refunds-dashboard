@@ -4,60 +4,58 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cancellation &amp; Refunds Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
 <style>
-  :root { color-scheme: light; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f6fa; color: #1a1a2e; min-height: 100vh; }
-  header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 20px 32px 0; }
-  .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.3px; }
-  header .subtitle { font-size: 0.85rem; color: #a0aec0; margin-top: 4px; }
-  .date-bar { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.07); border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 0; flex-wrap: wrap; }
-  .date-bar label { font-size: 0.75rem; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; white-space: nowrap; }
-  .date-bar input[type="date"] { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; padding: 7px 12px; font-size: 0.85rem; cursor: pointer; outline: none; color-scheme: dark; }
-  .date-bar input[type="date"]:hover, .date-bar input[type="date"]:focus { border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.15); }
-  .date-bar .sep { color: #718096; font-size: 0.8rem; }
-  .apply-btn { background: #4361ee; color: white; border: none; border-radius: 8px; padding: 7px 18px; font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
-  .apply-btn:hover { background: #3451d1; }
-  .reset-btn { background: transparent; color: #a0aec0; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; cursor: pointer; white-space: nowrap; }
-  .reset-btn:hover { color: white; border-color: rgba(255,255,255,0.35); }
-  .period-label { margin-left: auto; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 5px 14px; font-size: 0.75rem; color: #e2e8f0; font-weight: 500; white-space: nowrap; }
-  .period-label span { color: #90cdf4; font-weight: 700; }
-  main { padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
-  .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
-  .kpi-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-top: 4px solid; display: flex; flex-direction: column; }
-  .kpi-card.combined { border-color: #4361ee; } .kpi-card.followspy { border-color: #f77f00; } .kpi-card.recentfollow { border-color: #06d6a0; }
-  .kpi-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: #718096; font-weight: 600; margin-bottom: 8px; }
-  .kpi-total { font-size: 2.8rem; font-weight: 800; line-height: 1; margin-bottom: 12px; }
-  .kpi-card.combined .kpi-total { color: #4361ee; } .kpi-card.followspy .kpi-total { color: #f77f00; } .kpi-card.recentfollow .kpi-total { color: #06d6a0; }
-  .kpi-pills { display: flex; gap: 8px; flex-wrap: wrap; }
-  .pill { font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .pill.cancelled { background: #fff0f0; color: #c0392b; } .pill.refunded { background: #fffbf0; color: #d35400; } .pill.terminated { background: #f0f4ff; color: #2c3e50; }
-  .charts-row { display: grid; grid-template-columns: 1fr 1.8fr; gap: 16px; margin-bottom: 28px; }
-  .chart-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-  .card-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #718096; margin-bottom: 16px; }
-  .chart-wrap { position: relative; height: 220px; }
-  .tables-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
-  .table-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-  thead tr { border-bottom: 2px solid #edf2f7; }
-  thead th { text-align: left; padding: 8px 10px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px; color: #718096; font-weight: 700; }
-  thead th:not(:first-child) { text-align: right; }
-  tbody tr { border-bottom: 1px solid #f7fafc; } tbody tr:hover { background: #f7fafc; }
-  tbody td { padding: 9px 10px; color: #2d3748; } tbody td:not(:first-child) { text-align: right; }
-  tfoot tr { border-top: 2px solid #edf2f7; } tfoot td { padding: 10px 10px; font-weight: 700; color: #1a1a2e; } tfoot td:not(:first-child) { text-align: right; }
-  .zero { color: #cbd5e0; }
-  .legend { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #4a5568; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-  .section-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-  footer { text-align: center; padding: 16px; font-size: 0.75rem; color: #a0aec0; }
-  .no-data { display: none; text-align: center; padding: 48px 24px; color: #718096; }
-  .no-data .icon { font-size: 2.5rem; margin-bottom: 12px; }
-  .no-data p { font-size: 0.95rem; }
-  .no-data small { font-size: 0.8rem; color: #a0aec0; margin-top: 6px; display: block; }
+:root{color-scheme:light;}*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f6fa;color:#1a1a2e;min-height:100vh;}
+header{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);color:white;padding:20px 32px 0;}
+.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+header h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.3px;}
+header .subtitle{font-size:0.85rem;color:#a0aec0;margin-top:4px;}
+.date-bar{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.07);border-top:1px solid rgba(255,255,255,0.1);padding:14px 0;flex-wrap:wrap;}
+.date-bar label{font-size:0.75rem;color:#a0aec0;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;white-space:nowrap;}
+.date-bar input[type="date"]{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:white;padding:7px 12px;font-size:0.85rem;cursor:pointer;outline:none;color-scheme:dark;}
+.date-bar input[type="date"]:hover,.date-bar input[type="date"]:focus{border-color:rgba(255,255,255,0.45);background:rgba(255,255,255,0.15);}
+.date-bar .sep{color:#718096;font-size:0.8rem;}
+.apply-btn{background:#4361ee;color:white;border:none;border-radius:8px;padding:7px 18px;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+.apply-btn:hover{background:#3451d1;}
+.reset-btn{background:transparent;color:#a0aec0;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 14px;font-size:0.82rem;cursor:pointer;white-space:nowrap;}
+.reset-btn:hover{color:white;border-color:rgba(255,255,255,0.35);}
+.period-label{margin-left:auto;background:rgba(255,255,255,0.1);border-radius:20px;padding:5px 14px;font-size:0.75rem;color:#e2e8f0;font-weight:500;white-space:nowrap;}
+.period-label span{color:#90cdf4;font-weight:700;}
+main{padding:28px 32px;max-width:1200px;margin:0 auto;}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
+.kpi-card{background:white;border-radius:12px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,0.08);border-top:4px solid;display:flex;flex-direction:column;}
+.kpi-card.combined{border-color:#4361ee;}.kpi-card.followspy{border-color:#f77f00;}.kpi-card.recentfollow{border-color:#06d6a0;}
+.kpi-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.8px;color:#718096;font-weight:600;margin-bottom:8px;}
+.kpi-total{font-size:2.8rem;font-weight:800;line-height:1;margin-bottom:12px;}
+.kpi-card.combined .kpi-total{color:#4361ee;}.kpi-card.followspy .kpi-total{color:#f77f00;}.kpi-card.recentfollow .kpi-total{color:#06d6a0;}
+.kpi-pills{display:flex;gap:8px;flex-wrap:wrap;}
+.pill{font-size:0.72rem;font-weight:600;padding:3px 10px;border-radius:20px;}
+.pill.cancelled{background:#fff0f0;color:#c0392b;}.pill.refunded{background:#fffbf0;color:#d35400;}.pill.terminated{background:#f0f4ff;color:#2c3e50;}
+.charts-row{display:grid;grid-template-columns:1fr 1.8fr;gap:16px;margin-bottom:28px;}
+.chart-card{background:white;border-radius:12px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.card-title{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#718096;margin-bottom:16px;}
+.chart-wrap{position:relative;height:220px;}
+.tables-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;}
+.table-card{background:white;border-radius:12px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+thead tr{border-bottom:2px solid #edf2f7;}
+thead th{text-align:left;padding:8px 10px;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.6px;color:#718096;font-weight:700;}
+thead th:not(:first-child){text-align:right;}
+tbody tr{border-bottom:1px solid #f7fafc;}tbody tr:hover{background:#f7fafc;}
+tbody td{padding:9px 10px;color:#2d3748;}tbody td:not(:first-child){text-align:right;}
+tfoot tr{border-top:2px solid #edf2f7;}
+tfoot td{padding:10px;font-weight:700;color:#1a1a2e;}tfoot td:not(:first-child){text-align:right;}
+.zero{color:#cbd5e0;}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.section-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.legend{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#4a5568;}
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+footer{text-align:center;padding:16px;font-size:0.75rem;color:#a0aec0;}
+.no-data{display:none;text-align:center;padding:48px 24px;color:#718096;}
+.no-data .icon{font-size:2.5rem;margin-bottom:12px;}
 </style>
 </head>
 <body>
@@ -65,47 +63,47 @@
   <div class="header-top">
     <div>
       <h1>Cancellation &amp; Refunds Dashboard</h1>
-      <div class="subtitle">RF/FS Team &middot; Pivot - Cancellation</div>
+      <div class="subtitle">RF/FS Team &middot; RF/FS Tracker New</div>
     </div>
   </div>
   <div class="date-bar">
     <label>From</label>
-    <input type="date" id="dateFrom" value="2026-06-01">
+    <input type="date" id="dateFrom" value="2026-05-01">
     <span class="sep">&#8594;</span>
     <label>To</label>
     <input type="date" id="dateTo" value="2026-06-30">
     <button class="apply-btn" onclick="applyDateRange()">Apply</button>
     <button class="reset-btn" onclick="resetDateRange()">Reset</button>
-    <div class="period-label" id="periodLabel">Showing: <span>June 2026</span></div>
+    <div class="period-label" id="periodLabel">Showing: <span>May &ndash; Jun 2026</span></div>
   </div>
 </header>
 <main id="mainContent">
   <div class="kpi-row">
     <div class="kpi-card combined">
       <div class="kpi-label">Combined RF/FS</div>
-      <div class="kpi-total" id="kpiCombined">62</div>
+      <div class="kpi-total" id="kpiCombined">0</div>
       <div class="kpi-pills">
-        <span class="pill cancelled" id="pillCancelledCombined">48 Cancelled</span>
-        <span class="pill refunded" id="pillRefundedCombined">12 Refunded</span>
-        <span class="pill terminated" id="pillTerminatedCombined">2 Terminated</span>
+        <span class="pill cancelled" id="pillCanC">0 Cancelled</span>
+        <span class="pill refunded" id="pillRefC">0 Refunded</span>
+        <span class="pill terminated" id="pillTermC">0 Terminated</span>
       </div>
     </div>
     <div class="kpi-card followspy">
       <div class="kpi-label">FollowSpy Only</div>
-      <div class="kpi-total" id="kpiFollowspy">19</div>
+      <div class="kpi-total" id="kpiFS">0</div>
       <div class="kpi-pills">
-        <span class="pill cancelled" id="pillCancelledFS">12 Cancelled</span>
-        <span class="pill refunded" id="pillRefundedFS">6 Refunded</span>
-        <span class="pill terminated" id="pillTerminatedFS">1 Terminated</span>
+        <span class="pill cancelled" id="pillCanFS">0 Cancelled</span>
+        <span class="pill refunded" id="pillRefFS">0 Refunded</span>
+        <span class="pill terminated" id="pillTermFS">0 Terminated</span>
       </div>
     </div>
     <div class="kpi-card recentfollow">
       <div class="kpi-label">RecentFollow Only</div>
-      <div class="kpi-total" id="kpiRecentfollow">43</div>
+      <div class="kpi-total" id="kpiRF">0</div>
       <div class="kpi-pills">
-        <span class="pill cancelled" id="pillCancelledRF">36 Cancelled</span>
-        <span class="pill refunded" id="pillRefundedRF">6 Refunded</span>
-        <span class="pill terminated" id="pillTerminatedRF">1 Terminated</span>
+        <span class="pill cancelled" id="pillCanRF">0 Cancelled</span>
+        <span class="pill refunded" id="pillRefRF">0 Refunded</span>
+        <span class="pill terminated" id="pillTermRF">0 Terminated</span>
       </div>
     </div>
   </div>
@@ -113,10 +111,10 @@
     <div class="chart-card">
       <div class="card-title">Status Breakdown (Combined)</div>
       <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
-      <div class="legend" style="margin-top:14px;">
-        <div class="legend-item"><div class="dot" style="background:#e53e3e"></div><span id="legendCancelled">Cancelled (48)</span></div>
-        <div class="legend-item"><div class="dot" style="background:#f6ad55"></div><span id="legendRefunded">Refunded (12)</span></div>
-        <div class="legend-item"><div class="dot" style="background:#4361ee"></div><span id="legendTerminated">Terminated (2)</span></div>
+      <div class="legend">
+        <div class="legend-item"><div class="dot" style="background:#e53e3e"></div><span id="legCan">Cancelled (0)</span></div>
+        <div class="legend-item"><div class="dot" style="background:#f6ad55"></div><span id="legRef">Refunded (0)</span></div>
+        <div class="legend-item"><div class="dot" style="background:#4361ee"></div><span id="legTerm">Terminated (0)</span></div>
       </div>
     </div>
     <div class="chart-card">
@@ -128,31 +126,21 @@
     <div class="card-title">FollowSpy vs RecentFollow &mdash; Status Comparison</div>
     <div class="chart-wrap" style="height:200px;"><canvas id="compChart"></canvas></div>
   </div>
-  <div class="no-data" id="noDataNotice">
+  <div class="no-data" id="noData">
     <div class="icon">&#128235;</div>
     <p>No data available for selected range</p>
-    <small>Data is available for June 2026. Please select a date within that period.</small>
+    <small>Data covers May &ndash; June 2026. Please select a date within that period.</small>
   </div>
   <div id="tablesSection">
     <div class="table-card" style="margin-bottom:16px;">
       <div class="section-header">
         <div class="section-dot" style="background:#4361ee"></div>
-        <div class="card-title" style="margin-bottom:0">Combined RF/FS Refund/Cancellation</div>
+        <div class="card-title" style="margin-bottom:0">Combined RF/FS &mdash; By Plan</div>
       </div>
-      <table>
+      <table id="tblCombined">
         <thead><tr><th>Plan</th><th>Cancelled</th><th>Refunded</th><th>Terminated</th><th>Total</th></tr></thead>
-        <tbody>
-          <tr><td>Elite V1 Weekly</td><td>25</td><td>1</td><td class="zero">&#8212;</td><td><strong>26</strong></td></tr>
-          <tr><td>Elite V2 Monthly</td><td>1</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>1</strong></td></tr>
-          <tr><td>Expert Quarterly</td><td class="zero">&#8212;</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
-          <tr><td>Expert Weekly</td><td>10</td><td>2</td><td class="zero">&#8212;</td><td><strong>12</strong></td></tr>
-          <tr><td>Premium Lifetime</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td>1</td><td><strong>1</strong></td></tr>
-          <tr><td>Premium Quarterly</td><td class="zero">&#8212;</td><td>2</td><td class="zero">&#8212;</td><td><strong>2</strong></td></tr>
-          <tr><td>Premium Weekly</td><td>5</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>5</strong></td></tr>
-          <tr><td>Starter Quarterly</td><td class="zero">&#8212;</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
-          <tr><td>Starter Weekly</td><td>7</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>7</strong></td></tr>
-        </tbody>
-        <tfoot><tr><td>Grand Total</td><td id="ftCancelledCombined">48</td><td id="ftRefundedCombined">12</td><td id="ftTerminatedCombined">2</td><td id="ftTotalCombined">62</td></tr></tfoot>
+        <tbody id="tbodyCombined"></tbody>
+        <tfoot><tr><td>Grand Total</td><td id="ftCanC">0</td><td id="ftRefC">0</td><td id="ftTermC">0</td><td id="ftTotC">0</td></tr></tfoot>
       </table>
     </div>
     <div class="tables-row">
@@ -163,14 +151,8 @@
         </div>
         <table>
           <thead><tr><th>Plan</th><th>Cancelled</th><th>Refunded</th><th>Terminated</th><th>Total</th></tr></thead>
-          <tbody>
-            <tr><td>Premium Lifetime</td><td class="zero">&#8212;</td><td>1</td><td class="zero">&#8212;</td><td><strong>1</strong></td></tr>
-            <tr><td>Premium Quarterly</td><td class="zero">&#8212;</td><td>2</td><td class="zero">&#8212;</td><td><strong>2</strong></td></tr>
-            <tr><td>Premium Weekly</td><td>5</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>5</strong></td></tr>
-            <tr><td>Starter Quarterly</td><td class="zero">&#8212;</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
-            <tr><td>Starter Weekly</td><td>7</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>7</strong></td></tr>
-          </tbody>
-          <tfoot><tr><td>Grand Total</td><td id="ftCancelledFS">12</td><td id="ftRefundedFS">6</td><td id="ftTerminatedFS">1</td><td id="ftTotalFS">19</td></tr></tfoot>
+          <tbody id="tbodyFS"></tbody>
+          <tfoot><tr><td>Grand Total</td><td id="ftCanFS">0</td><td id="ftRefFS">0</td><td id="ftTermFS">0</td><td id="ftTotFS">0</td></tr></tfoot>
         </table>
       </div>
       <div class="table-card">
@@ -180,206 +162,165 @@
         </div>
         <table>
           <thead><tr><th>Plan</th><th>Cancelled</th><th>Refunded</th><th>Terminated</th><th>Total</th></tr></thead>
-          <tbody>
-            <tr><td>Elite V1 Weekly</td><td>25</td><td>1</td><td class="zero">&#8212;</td><td><strong>26</strong></td></tr>
-            <tr><td>Elite V2 Monthly</td><td>1</td><td class="zero">&#8212;</td><td class="zero">&#8212;</td><td><strong>1</strong></td></tr>
-            <tr><td>Expert Quarterly</td><td class="zero">&#8212;</td><td>3</td><td>1</td><td><strong>4</strong></td></tr>
-            <tr><td>Expert Weekly</td><td>10</td><td>2</td><td class="zero">&#8212;</td><td><strong>12</strong></td></tr>
-          </tbody>
-          <tfoot><tr><td>Grand Total</td><td id="ftCancelledRF">36</td><td id="ftRefundedRF">6</td><td id="ftTerminatedRF">1</td><td id="ftTotalRF">43</td></tr></tfoot>
+          <tbody id="tbodyRF"></tbody>
+          <tfoot><tr><td>Grand Total</td><td id="ftCanRF">0</td><td id="ftRefRF">0</td><td id="ftTermRF">0</td><td id="ftTotRF">0</td></tr></tfoot>
         </table>
       </div>
     </div>
   </div>
 </main>
-<footer>
-  Data sourced from RF/FS TEAM &middot; Pivot - Cancellation sheet &nbsp;&middot;&nbsp; <span id="footerPeriod">June 2026</span>
-</footer>
+<footer>Data sourced from RF/FS TEAM &middot; RF/FS Tracker New &nbsp;&middot;&nbsp; <span id="footerPeriod">May &ndash; Jun 2026</span></footer>
 <script>
-const FULL_START = '2026-06-01';
-const FULL_END   = '2026-06-30';
-const FULL = {
-  combined:    { cancelled: 48, refunded: 12, terminated: 2 },
-  followspy:   { cancelled: 12, refunded:  6, terminated: 1 },
-  recentfollow:{ cancelled: 36, refunded:  6, terminated: 1 }
-};
-const PLAN_DATA = [
-  { plan: 'Elite V1 Wkly', cancelled: 25, refunded: 1, terminated: 0 },
-  { plan: 'Expert Wkly',   cancelled: 10, refunded: 2, terminated: 0 },
-  { plan: 'Starter Wkly',  cancelled:  7, refunded: 0, terminated: 0 },
-  { plan: 'Starter Qrtly', cancelled:  0, refunded: 3, terminated: 1 },
-  { plan: 'Prem Wkly',     cancelled:  5, refunded: 0, terminated: 0 },
-  { plan: 'Expert Qrtly',  cancelled:  0, refunded: 3, terminated: 1 },
-  { plan: 'Prem Qrtly',    cancelled:  0, refunded: 2, terminated: 0 },
-  { plan: 'Elite V2 Mo',   cancelled:  1, refunded: 0, terminated: 0 },
-  { plan: 'Prem Life',     cancelled:  0, refunded: 0, terminated: 1 },
-];
+var RECORDS = [["5/1/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/1/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/1/2026","RecentFollow","Elite V1 Weekly","Past Due"],["5/1/2026","RecentFollow","Expert Weekly","Cancelled"],["5/1/2026","RecentFollow","Expert Weekly","Cancelled"],["5/1/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/1/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/1/2026","RecentFollow","Expert Quarterly","Refunded"],["5/1/2026","RecentFollow","Elite V1 Weekly","Past Due"],["5/1/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/1/2026","RecentFollow","Expert Weekly","Cancelled"],["5/1/2026","RecentFollow","Other - No Acct","N/A"],["5/1/2026","RecentFollow","Expert Weekly","Active"],["5/1/2026","RecentFollow","Expert Weekly","Refunded"],["5/1/2026","RecentFollow","Expert Quarterly","Active"],["5/1/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/1/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/2/2026","RecentFollow","Expert Weekly","Terminated"],["5/2/2026","RecentFollow","Other - No Acct","N/A"],["5/2/2026","RecentFollow","Other - No Acct","N/A"],["5/3/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/3/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/3/2026","RecentFollow","Expert Weekly","Cancelled"],["5/3/2026","RecentFollow","Expert Weekly","Active"],["5/4/2026","RecentFollow","Expert Weekly","Active"],["5/4/2026","RecentFollow","Elite V1 Weekly","Active"],["5/4/2026","RecentFollow","Expert Weekly","Cancelled"],["5/4/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/4/2026","RecentFollow","Expert Weekly","Cancelled"],["5/5/2026","RecentFollow","Expert Quarterly","Refunded"],["5/5/2026","RecentFollow","Expert Weekly","Active"],["5/5/2026","RecentFollow","Starter Quarterly","Active"],["5/5/2026","RecentFollow","Starter Weekly","Active"],["5/5/2026","RecentFollow","Elite V1 Weekly","Active"],["5/5/2026","RecentFollow","Expert Weekly","Active"],["5/1/2026","FollowSpy","Starter Weekly","Cancelled"],["5/1/2026","FollowSpy","Premium Weekly","Refunded"],["5/1/2026","FollowSpy","Premium Weekly","Cancelled"],["5/1/2026","FollowSpy","Premium Quarterly","Refunded"],["5/1/2026","FollowSpy","Starter Weekly","Refunded"],["5/1/2026","FollowSpy","Starter Weekly","Cancelled"],["5/1/2026","FollowSpy","Premium Weekly","Cancelled"],["5/1/2026","FollowSpy","Premium Weekly","Cancelled"],["5/1/2026","FollowSpy","Starter Weekly","Cancelled"],["5/1/2026","FollowSpy","Starter Weekly","Cancelled"],["5/2/2026","FollowSpy","Starter Weekly","Cancelled"],["5/2/2026","FollowSpy","Starter Weekly","Cancelled"],["5/2/2026","FollowSpy","Premium Weekly","Cancelled"],["5/2/2026","FollowSpy","Premium Weekly","Cancelled"],["5/2/2026","FollowSpy","Premium Weekly","Cancelled"],["5/2/2026","FollowSpy","Premium Weekly","Cancelled"],["5/2/2026","FollowSpy","Premium Weekly","Cancelled"],["5/2/2026","FollowSpy","Starter Weekly","Cancelled"],["5/3/2026","FollowSpy","Premium Quarterly","Cancelled"],["5/3/2026","FollowSpy","Premium Weekly","Cancelled"],["5/3/2026","FollowSpy","Starter Weekly","Cancelled"],["5/3/2026","FollowSpy","Starter Weekly","Cancelled"],["5/3/2026","FollowSpy","Starter Weekly","Cancelled"],["5/3/2026","FollowSpy","Starter Weekly","Cancelled"],["05/04/2026","FollowSpy","Starter Weekly","Active"],["05/04/2026","FollowSpy","Starter Quarterly","Active"],["05/04/2026","FollowSpy","Premium Weekly","Refunded"],["05/04/2026","FollowSpy","Starter Weekly","Refunded"],["05/04/2026","FollowSpy","Premium Weekly","Refunded"],["05/04/2026","FollowSpy","Starter Weekly","Refunded"],["05/04/2026","FollowSpy","Starter Weekly","Refunded"],["05/04/2026","FollowSpy","Starter Weekly","Cancelled"],["05/04/2026","FollowSpy","Starter Weekly","Cancelled"],["05/04/2026","FollowSpy","Premium Weekly","Cancelled"],["05/04/2026","FollowSpy","Premium Weekly","Cancelled"],["05/04/2026","FollowSpy","Premium Quarterly","Refunded"],["05/04/2026","FollowSpy","Premium Weekly","Cancelled"],["05/05/2026","FollowSpy","Starter Weekly","Cancelled"],["05/05/2026","FollowSpy","Premium Weekly","Cancelled"],["05/05/2026","FollowSpy","Starter Quarterly","Active"],["05/05/2026","FollowSpy","Premium Weekly","Cancelled"],["05/05/2026","FollowSpy","Starter Quarterly","Cancelled"],["05/05/2026","FollowSpy","Starter Quarterly","Cancelled"],["05/05/2026","FollowSpy","Starter Quarterly","Refunded"],["05/05/2026","FollowSpy","Starter Quarterly","Refunded"],["05/05/2026","FollowSpy","Starter Quarterly","Refunded"],["05/05/2026","FollowSpy","Premium Quarterly","Refunded"],["05/05/2026","FollowSpy","Starter Quarterly","Cancelled"],["05/05/2026","FollowSpy","Starter Quarterly","Refunded"],["5/5/2026","RecentFollow","Expert Weekly","Cancelled"],["5/5/2026","FollowSpy","Elite V1 Weekly","Cancelled"],["5/5/2026","FollowSpy","Premium Weekly","Cancelled"],["5/5/2026","FollowSpy","Starter Weekly","Cancelled"],["5/5/2026","FollowSpy","Premium Weekly","Cancelled"],["5/5/2026","FollowSpy","Starter Weekly","Cancelled"],["5/5/2026","FollowSpy","Premium Weekly","Cancelled"],["5/5/2026","FollowSpy","Premium Weekly","Cancelled"],["5/5/2026","FollowSpy","Starter Weekly","Cancelled"],["5/5/2026","FollowSpy","Premium Weekly","Cancelled"],["5/5/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/5/2026","FollowSpy","Starter Quarterly","Terminated"],["5/5/2026","FollowSpy","Premium Quarterly","Terminated"],["5/5/2026","FollowSpy","Starter Quarterly","Terminated"],["5/5/2026","FollowSpy","Starter Quarterly","Refunded"],["5/5/2026","FollowSpy","Starter Quarterly","Terminated"],["5/5/2026","FollowSpy","Starter Quarterly","Refunded"],["5/5/2026","FollowSpy","Premium Weekly","Terminated"],["5/5/2026","FollowSpy","Premium Quarterly","Terminated"],["5/5/2026","RecentFollow","Expert Weekly","Cancelled"],["05/06/2026","FollowSpy","Starter Weekly","Cancelled"],["05/06/2026","FollowSpy","Premium Weekly","Cancelled"],["05/06/2026","FollowSpy","Starter Quarterly","Refunded"],["05/06/2026","FollowSpy","Starter Quarterly","Refunded"],["05/06/2026","FollowSpy","Elite V1 Weekly","Cancelled"],["05/06/2026","FollowSpy","Starter Weekly","Terminated"],["05/07/2026","FollowSpy","Starter Weekly","Cancelled"],["05/07/2026","FollowSpy","Starter Weekly","Cancelled"],["05/07/2026","FollowSpy","Premium Weekly","Cancelled"],["05/07/2026","FollowSpy","Starter Weekly","Cancelled"],["05/07/2026","FollowSpy","Starter Weekly","Terminated"],["05/08/2026","FollowSpy","Premium Weekly","Cancelled"],["05/08/2026","FollowSpy","Elite V1 Weekly","Cancelled"],["05/08/2026","RecentFollow","Expert Quarterly","Refunded"],["05/08/2026","FollowSpy","Premium Quarterly","Refunded"],["05/08/2026","FollowSpy","Premium Weekly","Cancelled"],["05/08/2026","FollowSpy","Starter Weekly","Cancelled"],["05/08/2026","FollowSpy","Premium Weekly","Cancelled"],["05/08/2026","FollowSpy","Premium Weekly","Cancelled"],["05/09/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["05/09/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["05/09/2026","FollowSpy","Premium Lifetime","Cancelled"],["05/09/2026","FollowSpy","Starter Weekly","Cancelled"],["05/09/2026","FollowSpy","Starter Weekly","Cancelled"],["05/09/2026","FollowSpy","Starter Weekly","Cancelled"],["05/09/2026","FollowSpy","Premium Weekly","Cancelled"],["05/09/2026","RecentFollow","Expert Weekly","Cancelled"],["05/09/2026","FollowSpy","Premium Weekly","Refunded"],["05/09/2026","FollowSpy","Premium Weekly","Cancelled"],["05/09/2026","FollowSpy","Starter Weekly","Cancelled"],["05/09/2026","FollowSpy","Starter Weekly","Cancelled"],["05/10/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["05/10/2026","RecentFollow","Starter Weekly","Cancelled"],["05/10/2026","RecentFollow","Expert Weekly","Cancelled"],["05/10/2026","FollowSpy","Starter Weekly","Cancelled"],["05/10/2026","RecentFollow","Expert Weekly","Terminated"],["05/10/2026","FollowSpy","Premium Weekly","Cancelled"],["05/10/2026","FollowSpy","Starter Weekly","Cancelled"],["05/10/2026","FollowSpy","Premium Weekly","Cancelled"],["05/10/2026","FollowSpy","Starter Weekly","Cancelled"],["5/11/2026","FollowSpy","Other - No Acct","Cancelled"],["5/11/2026","RecentFollow","Starter Weekly","Cancelled"],["5/11/2026","FollowSpy","Starter Weekly","Cancelled"],["5/11/2026","RecentFollow","Expert Weekly","Cancelled"],["5/11/2026","RecentFollow","Expert Weekly","Cancelled"],["5/11/2026","FollowSpy","Starter Weekly","Cancelled"],["5/11/2026","FollowSpy","Starter Weekly","Cancelled"],["5/11/2026","FollowSpy","Premium Weekly","Cancelled"],["5/11/2026","FollowSpy","Starter Weekly","Cancelled"],["5/11/2026","FollowSpy","Premium Weekly","Cancelled"],["5/11/2026","FollowSpy","Starter Weekly","Cancelled"],["5/11/2026","FollowSpy","Starter Weekly","Cancelled"],["5/11/2026","FollowSpy","Starter Weekly","Cancelled"],["5/11/2026","FollowSpy","Premium Weekly","Cancelled"],["5/11/2026","RecentFollow","Starter Weekly","Cancelled"],["5/11/2026","RecentFollow","Starter Weekly","Cancelled"],["5/12/2026","FollowSpy","Premium Weekly","Cancelled"],["5/12/2026","RecentFollow","Expert Weekly","Cancelled"],["5/12/2026","FollowSpy","Starter Weekly","Cancelled"],["5/12/2026","FollowSpy","Starter Weekly","Refunded"],["5/12/2026","FollowSpy","Premium Weekly","Cancelled"],["5/12/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/12/2026","FollowSpy","Premium Weekly","Cancelled"],["5/12/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/12/2026","RecentFollow","Expert Quarterly","Cancelled"],["5/12/2026","RecentFollow","Expert Weekly","Past Due"],["5/12/2026","FollowSpy","Starter Weekly","Cancelled"],["5/12/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/12/2026","FollowSpy","Starter Weekly","Cancelled"],["5/12/2026","FollowSpy","Starter Weekly","Cancelled"],["5/12/2026","FollowSpy","Starter Weekly","Cancelled"],["5/12/2026","FollowSpy","Starter Weekly","Cancelled"],["5/12/2026","FollowSpy","Premium Weekly","Cancelled"],["5/12/2026","FollowSpy","Premium Weekly","Cancelled"],["5/13/2026","FollowSpy","Premium Quarterly","Terminated"],["5/13/2026","FollowSpy","Premium Quarterly","Refunded"],["5/13/2026","RecentFollow","Elite V1 Weekly","Terminated"],["5/13/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/13/2026","RecentFollow","Expert Weekly","Terminated"],["5/13/2026","FollowSpy","Starter Weekly","Terminated"],["5/13/2026","RecentFollow","Starter Quarterly","Active"],["5/13/2026","FollowSpy","Premium Weekly","Cancelled"],["5/14/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/14/2026","FollowSpy","Starter Weekly","Cancelled"],["5/14/2026","FollowSpy","Premium Weekly","Cancelled"],["5/14/2026","FollowSpy","Starter Quarterly","Refunded"],["05/14/2026","FollowSpy","Starter Weekly","Cancelled"],["05/14/2026","RecentFollow","Expert Weekly","Cancelled"],["05/14/2026","FollowSpy","Expert Quarterly","Cancelled"],["5/14/2026","FollowSpy","Premium Weekly","Terminated"],["5/14/2026","FollowSpy","Starter Weekly","Cancelled"],["5/14/2026","FollowSpy","Starter Quarterly","Terminated"],["5/14/2026","RecentFollow","Elite V1 Weekly","Terminated"],["5/15/2026","FollowSpy","Premium Weekly","Refunded"],["5/15/2026","FollowSpy","Premium Weekly","Cancelled"],["5/15/2026","FollowSpy","Premium Weekly","Cancelled"],["05/15/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["05/15/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["05/15/2026","RecentFollow","Expert Weekly","Cancelled"],["05/15/2026","FollowSpy","Starter Quarterly","Terminated"],["5/15/2026","RecentFollow","Expert Weekly","Cancelled"],["5/16/2026","RecentFollow","Expert Weekly","Cancelled"],["5/16/2026","FollowSpy","Premium Weekly","Cancelled"],["5/16/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/16/2026","RecentFollow","Expert Weekly","Cancelled"],["5/17/2026","RecentFollow","Expert Weekly","Cancelled"],["5/17/2026","FollowSpy","Premium Weekly","Cancelled"],["5/17/2026","FollowSpy","Starter Weekly","Cancelled"],["5/18/2026","FollowSpy","Starter Weekly","Cancelled"],["5/18/2026","FollowSpy","Starter Weekly","Cancelled"],["5/18/2026","RecentFollow","Expert Quarterly","Refunded"],["5/18/2026","RecentFollow","Expert Quarterly","Refunded"],["5/18/2026","FollowSpy","Premium Weekly","Cancelled"],["5/18/2026","RecentFollow","Expert Weekly","Cancelled"],["5/18/2026","RecentFollow","Expert Weekly","Terminated"],["5/18/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/18/2026","FollowSpy","Starter Weekly","Cancelled"],["5/18/2026","FollowSpy","Starter Weekly","Cancelled"],["5/18/2026","FollowSpy","Starter Weekly","Cancelled"],["5/18/2026","RecentFollow","Elite Weekly","Cancelled"],["5/18/2026","FollowSpy","Premium Weekly","Cancelled"],["5/18/2026","RecentFollow","Expert Weekly","Cancelled"],["5/18/2026","FollowSpy","Starter Weekly","Cancelled"],["5/18/2026","FollowSpy","Starter Weekly","Terminated"],["5/18/2026","FollowSpy","Premium Weekly","Cancelled"],["5/18/2026","FollowSpy","Starter Weekly","Cancelled"],["5/18/2026","FollowSpy","Premium Weekly","Cancelled"],["5/19/2026","RecentFollow","Expert Weekly","Cancelled"],["5/19/2026","FollowSpy","Starter Weekly","Cancelled"],["5/19/2026","RecentFollow","Expert Weekly","Cancelled"],["5/19/2026","FollowSpy","Starter Quarterly","Refunded"],["5/19/2026","RecentFollow","Expert Weekly","Cancelled"],["5/19/2026","FollowSpy","Premium Weekly","Cancelled"],["5/19/2026","FollowSpy","Starter Weekly","Cancelled"],["5/19/2026","FollowSpy","Starter Weekly","Cancelled"],["5/19/2026","FollowSpy","Premium Weekly","Cancelled"],["5/19/2026","FollowSpy","Starter Weekly","Cancelled"],["5/19/2026","FollowSpy","Starter Weekly","Cancelled"],["5/20/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/20/2026","FollowSpy","Starter Quarterly","Refunded"],["5/20/2026","FollowSpy","Starter Quarterly","Refunded"],["5/20/2026","FollowSpy","Starter Quarterly","Refunded"],["05/20/2026","FollowSpy","Premium Quarterly","Refunded"],["05/20/2026","RecentFollow","Expert Weekly","Cancelled"],["05/20/2026","RecentFollow","Expert Quarterly","Refunded"],["05/20/2026","FollowSpy","Premium Weekly","Refunded"],["05/20/2026","RecentFollow","Elite Weekly","Cancelled"],["05/21/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["05/21/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["05/21/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["05/21/2026","FollowSpy","Premium Quarterly","Cancelled"],["05/21/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/21/2026","RecentFollow","Elite V1 Weekly","Terminated"],["05/22/2026","FollowSpy","Starter Weekly","Terminated"],["05/22/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["05/22/2026","RecentFollow","Expert Weekly","Cancelled"],["05/22/2026","RecentFollow","Expert Weekly","Cancelled"],["05/22/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["05/23/2026","FollowSpy","Starter Weekly","Cancelled"],["5/24/20263","FollowSpy","Starter Weekly","Cancelled"],["5/24/20263","RecentFollow","Expert Weekly","Cancelled"],["5/24/20263","RecentFollow","Elite V1 Weekly","Cancelled"],["5/24/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/24/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/24/2026","FollowSpy","Expert Weekly","Cancelled"],["5/24/2026","FollowSpy","Premium Weekly","Cancelled"],["5/24/2026","FollowSpy","Starter Weekly","Cancelled"],["5/24/2026","FollowSpy","Starter Weekly","Cancelled"],["5/25/2026","RecentFollow","Expert Weekly","Cancelled"],["5/25/2026","FollowSpy","Starter Weekly","Cancelled"],["5/25/2026","FollowSpy","Premium Weekly","Cancelled"],["5/25/2026","FollowSpy","Starter Weekly","Cancelled"],["5/25/2026","FollowSpy","Starter Weekly","Cancelled"],["5/26/2026","RecentFollow","Expert Weekly","Cancelled"],["5/26/2026","FollowSpy","Premium Weekly","Cancelled"],["5/27/2026","FollowSpy","Starter Weekly","Cancelled"],["5/27/2026","FollowSpy","Starter Weekly","Active"],["5/27/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/27/2026","RecentFollow","Expert Quarterly","Refunded"],["5/27/2026","FollowSpy","Premium Quarterly","Refunded"],["5/27/2026","RecentFollow","Expert Weekly","Cancelled"],["5/27/2026","RecentFollow","Elite V2 Monthly","Cancelled"],["05/28/2026","FollowSpy","Starter Weekly","Cancelled"],["5/28/2026","FollowSpy","Starter Weekly","Refunded"],["5/28/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/28/2026","FollowSpy","Starter Weekly","Cancelled"],["5/28/2026","FollowSpy","Premium Weekly","Refunded"],["5/28/2026","RecentFollow","Expert Weekly","Terminated"],["5/29/2026","FollowSpy","Starter Quarterly","Refunded"],["5/29/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/29/2026","FollowSpy","Starter Weekly","Refunded"],["5/29/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/29/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/29/2026","FollowSpy","Starter Quarterly","Refunded"],["5/30/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/30/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/30/2026","FollowSpy","Premium Weekly","Cancelled"],["5/30/2026","FollowSpy","Premium Weekly","Cancelled"],["5/30/2026","FollowSpy","Starter Weekly","Cancelled"],["5/31/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/31/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/31/2026","FollowSpy","Premium Weekly","Cancelled"],["5/31/2026","FollowSpy","Premium Weekly","Cancelled"],["5/31/2026","FollowSpy","Premium Weekly","Cancelled"],["5/31/2026","FollowSpy","Elite V1 Weekly","Cancelled"],["5/31/2026","RecentFollow","Expert Weekly","Cancelled"],["5/31/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["5/31/2026","RecentFollow","Expert Quarterly","Refunded"],["06/01/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/01/2026","FollowSpy","Starter Quarterly","Refunded"],["6/1/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["6/1/2026","FollowSpy","Starter Weekly","Cancelled"],["6/1/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["6/1/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["6/1/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["6/2/2026","FollowSpy","Premium Weekly","Cancelled"],["06/02/2026","FollowSpy","Starter Quarterly","Refunded"],["06/02/2026","FollowSpy","Premium Quarterly","Refunded"],["06/02/2026","RecentFollow","Expert Weekly","Cancelled"],["06/02/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/02/2026","FollowSpy","Starter Quarterly","Refunded"],["06/02/2026","RecentFollow","Expert Quarterly","Refunded"],["06/02/2026","FollowSpy","Premium Weekly","Cancelled"],["06/02/2026","FollowSpy","Starter Weekly","Cancelled"],["06/03/2026","RecentFollow","Expert Weekly","Refunded"],["06/03/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/03/2026","RecentFollow","Elite V1 Weekly","Refunded"],["06/03/2026","FollowSpy","Premium Weekly","Cancelled"],["06/04/2026","RecentFollow","Expert Weekly","Cancelled"],["06/04/2026","RecentFollow","Expert Weekly","Cancelled"],["06/04/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/04/2026","RecentFollow","Expert Weekly","Cancelled"],["06/04/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/05/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/05/2026","FollowSpy","Premium Weekly","Cancelled"],["06/05/2026","FollowSpy","Premium Quarterly","Refunded"],["06/05/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/05/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/05/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/05/2026","RecentFollow","Expert Weekly","Cancelled"],["06/05/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/05/2026","RecentFollow","Expert Quarterly","Refunded"],["06/05/2026","RecentFollow","Expert Weekly","Cancelled"],["06/05/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/07/2026","RecentFollow","Expert Weekly","Cancelled"],["06/07/2026","RecentFollow","Expert Weekly","Cancelled"],["06/07/2026","FollowSpy","Starter Weekly","Cancelled"],["06/08/2026","FollowSpy","Starter Weekly","Cancelled"],["06/08/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/08/2026","RecentFollow","Expert Weekly","Refunded"],["06/08/2026","FollowSpy","Premium Weekly","Cancelled"],["06/08/2026","FollowSpy","Starter Weekly","Cancelled"],["06/08/2026","RecentFollow","Expert Quarterly","Terminated"],["06/08/2026","FollowSpy","Starter Weekly","Cancelled"],["06/08/2026","FollowSpy","Starter Weekly","Cancelled"],["06/08/2026","FollowSpy","Starter Quarterly","Terminated"],["06/09/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/09/2026","RecentFollow","Expert Quarterly","Refunded"],["06/09/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/09/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/09/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/09/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/10/2026","FollowSpy","Standard Annual","Refunded"],["06/10/2026","FollowSpy","Other - No Acct","N/A"],["06/10/2026","RecentFollow","Elite V2 Monthly","Cancelled"],["06/10/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/11/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/11/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/11/2026","RecentFollow","Expert Weekly","Cancelled"],["06/11/2026","RecentFollow","Elite V1 Weekly","Cancelled"],["06/11/2026","FollowSpy","Premium Lifetime","Refunded"],["06/11/2026","RecentFollow","Expert Weekly","Cancelled"],["06/11/2026","RecentFollow","Expert Weekly","Active"],["06/11/2026","RecentFollow","Expert Weekly","Cancelled"],["06/12/2026","FollowSpy","Starter Weekly","Refunded"]];
 
-function computeTotals(from, to) {
-  var dataStart = new Date(FULL_START + 'T00:00:00');
-  var dataEnd   = new Date(FULL_END   + 'T00:00:00');
-  var selStart  = new Date(from + 'T00:00:00');
-  var selEnd    = new Date(to   + 'T00:00:00');
-  if (selEnd < dataStart || selStart > dataEnd) return null;
-  return {
-    combined:    { cancelled: FULL.combined.cancelled,    refunded: FULL.combined.refunded,    terminated: FULL.combined.terminated },
-    followspy:   { cancelled: FULL.followspy.cancelled,   refunded: FULL.followspy.refunded,   terminated: FULL.followspy.terminated },
-    recentfollow:{ cancelled: FULL.recentfollow.cancelled,refunded: FULL.recentfollow.refunded,terminated: FULL.recentfollow.terminated },
-    ratio: 1
-  };
+function parseD(s){var p=s.split('/');var yr=parseInt(p[2]);if(yr>2100)return null;return new Date(yr,parseInt(p[0])-1,parseInt(p[1]));}
+
+function filterRecs(from,to){
+  var f=new Date(from),t=new Date(to);
+  return RECORDS.filter(function(r){var d=parseD(r[0]);return d&&d>=f&&d<=t;});
 }
 
-function formatPeriod(from, to) {
-  var f = new Date(from + 'T00:00:00');
-  var t = new Date(to   + 'T00:00:00');
-  if (f.getMonth() === t.getMonth() && f.getFullYear() === t.getFullYear()) {
-    if (f.getDate() === 1 && t.getDate() >= 28) return f.toLocaleString('default', { month: 'long', year: 'numeric' });
-    return f.toLocaleString('default',{month:'short',day:'numeric'}) + ' - ' + t.toLocaleString('default',{month:'short',day:'numeric',year:'numeric'});
-  }
-  return f.toLocaleString('default',{month:'short',year:'numeric'}) + ' - ' + t.toLocaleString('default',{month:'short',year:'numeric'});
+function stats(recs){
+  var s={combined:{can:0,ref:0,term:0},fs:{can:0,ref:0,term:0},rf:{can:0,ref:0,term:0},plans:{}};
+  recs.forEach(function(r){
+    var lob=r[1],plan=r[2],st=r[3];
+    var isCan=st==='Cancelled',isRef=st==='Refunded',isTerm=st==='Terminated';
+    if(!isCan&&!isRef&&!isTerm)return;
+    s.combined.can+=isCan?1:0;s.combined.ref+=isRef?1:0;s.combined.term+=isTerm?1:0;
+    var lo=lob==='FollowSpy'?s.fs:s.rf;
+    lo.can+=isCan?1:0;lo.ref+=isRef?1:0;lo.term+=isTerm?1:0;
+    if(!s.plans[plan])s.plans[plan]={can:0,ref:0,term:0,fs:{can:0,ref:0,term:0},rf:{can:0,ref:0,term:0}};
+    s.plans[plan].can+=isCan?1:0;s.plans[plan].ref+=isRef?1:0;s.plans[plan].term+=isTerm?1:0;
+    var pp=lob==='FollowSpy'?s.plans[plan].fs:s.plans[plan].rf;
+    pp.can+=isCan?1:0;pp.ref+=isRef?1:0;pp.term+=isTerm?1:0;
+  });
+  return s;
 }
 
-var statusChart, planChart, compChart;
+function fmtPeriod(from,to){
+  var f=new Date(from),t=new Date(to);
+  var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if(f.getFullYear()===t.getFullYear()&&f.getMonth()===t.getMonth())return mo[f.getMonth()]+' '+f.getFullYear();
+  if(f.getFullYear()===t.getFullYear())return mo[f.getMonth()]+' – '+mo[t.getMonth()]+' '+t.getFullYear();
+  return mo[f.getMonth()]+' '+f.getFullYear()+' – '+mo[t.getMonth()]+' '+t.getFullYear();
+}
 
-function initCharts() {
-  statusChart = new Chart(document.getElementById('statusChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Cancelled','Refunded','Terminated'],
-      datasets: [{ data: [48,12,2], backgroundColor: ['#e53e3e','#f6ad55','#4361ee'], borderWidth: 0, hoverOffset: 6 }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+function z(v){return v===0?'<td class="zero">&mdash;</td>':'<td>'+v+'</td>';}
+
+function buildTable(tbodyId,planData,lob){
+  var plans=Object.keys(planData).sort(function(a,b){
+    var ta=(planData[a].can+planData[a].ref+planData[a].term),tb=(planData[b].can+planData[b].ref+planData[b].term);
+    return tb-ta;
   });
-
-  planChart = new Chart(document.getElementById('planChart'), {
-    type: 'bar',
-    data: {
-      labels: PLAN_DATA.map(function(d){ return d.plan; }),
-      datasets: [
-        { label: 'Cancelled',  data: PLAN_DATA.map(function(d){ return d.cancelled; }),  backgroundColor: '#e53e3e' },
-        { label: 'Refunded',   data: PLAN_DATA.map(function(d){ return d.refunded; }),   backgroundColor: '#f6ad55' },
-        { label: 'Terminated', data: PLAN_DATA.map(function(d){ return d.terminated; }), backgroundColor: '#4361ee' }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
-      scales: { x: { stacked: true, ticks: { font: { size: 10 } } }, y: { stacked: true, beginAtZero: true } }
-    }
+  var rows='';
+  plans.forEach(function(p){
+    var d=lob?planData[p][lob]:planData[p];
+    var tot=d.can+d.ref+d.term;
+    if(tot===0)return;
+    rows+='<tr><td>'+p+'</td>'+z(d.can)+z(d.ref)+z(d.term)+'<td><strong>'+tot+'</strong></td></tr>';
   });
+  document.getElementById(tbodyId).innerHTML=rows||'<tr><td colspan="5" style="text-align:center;color:#a0aec0;padding:16px">No data</td></tr>';
+}
 
-  compChart = new Chart(document.getElementById('compChart'), {
-    type: 'bar',
-    data: {
-      labels: ['Cancelled','Refunded','Terminated'],
-      datasets: [
-        { label: 'FollowSpy',    data: [12,6,1], backgroundColor: '#f77f00' },
-        { label: 'RecentFollow', data: [36,6,1], backgroundColor: '#06d6a0' }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
-      scales: { x: { ticks: { font: { size: 11 } } }, y: { beginAtZero: true } }
-    }
+var statusChart,planChart,compChart;
+
+function initCharts(){
+  statusChart=new Chart(document.getElementById('statusChart'),{
+    type:'doughnut',
+    data:{labels:['Cancelled','Refunded','Terminated'],datasets:[{data:[0,0,0],backgroundColor:['#e53e3e','#f6ad55','#4361ee'],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+  });
+  planChart=new Chart(document.getElementById('planChart'),{
+    type:'bar',
+    data:{labels:[],datasets:[
+      {label:'Cancelled',data:[],backgroundColor:'#e53e3e'},
+      {label:'Refunded',data:[],backgroundColor:'#f6ad55'},
+      {label:'Terminated',data:[],backgroundColor:'#4361ee'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:11}}}},scales:{x:{stacked:true,ticks:{font:{size:10}}},y:{stacked:true,beginAtZero:true}}}
+  });
+  compChart=new Chart(document.getElementById('compChart'),{
+    type:'bar',
+    data:{labels:['Cancelled','Refunded','Terminated'],datasets:[
+      {label:'FollowSpy',data:[0,0,0],backgroundColor:'#f77f00'},
+      {label:'RecentFollow',data:[0,0,0],backgroundColor:'#06d6a0'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:11}}}},scales:{x:{ticks:{font:{size:11}}},y:{beginAtZero:true}}}
   });
 }
 
-function applyDateRange() {
-  var from = document.getElementById('dateFrom').value;
-  var to   = document.getElementById('dateTo').value;
-  if (!from || !to || from > to) { alert('Please select a valid date range.'); return; }
-
-  var totals = computeTotals(from, to);
-  var noData = document.getElementById('noDataNotice');
-  var tables = document.getElementById('tablesSection');
-
-  if (!totals) {
-    noData.style.display = 'block';
-    tables.style.display = 'none';
-    document.getElementById('kpiCombined').textContent     = '0';
-    document.getElementById('kpiFollowspy').textContent    = '0';
-    document.getElementById('kpiRecentfollow').textContent = '0';
-    ['Combined','FS','RF'].forEach(function(s) {
-      document.getElementById('pillCancelled'+s).textContent  = '0 Cancelled';
-      document.getElementById('pillRefunded'+s).textContent   = '0 Refunded';
-      document.getElementById('pillTerminated'+s).textContent = '0 Terminated';
-    });
-    document.getElementById('periodLabel').innerHTML = 'Showing: <span>No data</span>';
-    document.getElementById('footerPeriod').textContent = 'No data for selected range';
-    statusChart.data.datasets[0].data = [0, 0, 0]; statusChart.update();
-    planChart.data.datasets[0].data = PLAN_DATA.map(function(){ return 0; });
-    planChart.data.datasets[1].data = PLAN_DATA.map(function(){ return 0; });
-    planChart.data.datasets[2].data = PLAN_DATA.map(function(){ return 0; });
-    planChart.update();
-    compChart.data.datasets[0].data = [0, 0, 0];
-    compChart.data.datasets[1].data = [0, 0, 0]; compChart.update();
-    document.getElementById('legendCancelled').textContent = 'Cancelled (0)';
-    document.getElementById('legendRefunded').textContent  = 'Refunded (0)';
-    document.getElementById('legendTerminated').textContent= 'Terminated (0)';
+function updateDashboard(recs,from,to){
+  var noData=document.getElementById('noData');
+  var tables=document.getElementById('tablesSection');
+  if(recs.length===0){
+    noData.style.display='block';tables.style.display='none';
+    ['kpiCombined','kpiFS','kpiRF'].forEach(function(id){document.getElementById(id).textContent='0';});
+    ['pillCanC','pillRefC','pillTermC','pillCanFS','pillRefFS','pillTermFS','pillCanRF','pillRefRF','pillTermRF'].forEach(function(id){document.getElementById(id).textContent=id.includes('Can')?'0 Cancelled':id.includes('Ref')?'0 Refunded':'0 Terminated';});
+    statusChart.data.datasets[0].data=[0,0,0];statusChart.update();
+    planChart.data.labels=[];planChart.data.datasets.forEach(function(d){d.data=[];});planChart.update();
+    compChart.data.datasets[0].data=[0,0,0];compChart.data.datasets[1].data=[0,0,0];compChart.update();
+    document.getElementById('legCan').textContent='Cancelled (0)';
+    document.getElementById('legRef').textContent='Refunded (0)';
+    document.getElementById('legTerm').textContent='Terminated (0)';
+    document.getElementById('periodLabel').innerHTML='Showing: <span>No data</span>';
+    document.getElementById('footerPeriod').textContent='No data for selected range';
     return;
   }
-
-  noData.style.display = 'none';
-  tables.style.display = '';
-
-  var c = totals.combined, f = totals.followspy, r = totals.recentfollow, ratio = totals.ratio;
-
-  document.getElementById('kpiCombined').textContent     = c.cancelled + c.refunded + c.terminated;
-  document.getElementById('kpiFollowspy').textContent    = f.cancelled + f.refunded + f.terminated;
-  document.getElementById('kpiRecentfollow').textContent = r.cancelled + r.refunded + r.terminated;
-
-  document.getElementById('pillCancelledCombined').textContent  = c.cancelled  + ' Cancelled';
-  document.getElementById('pillRefundedCombined').textContent   = c.refunded   + ' Refunded';
-  document.getElementById('pillTerminatedCombined').textContent = c.terminated + ' Terminated';
-  document.getElementById('pillCancelledFS').textContent        = f.cancelled  + ' Cancelled';
-  document.getElementById('pillRefundedFS').textContent         = f.refunded   + ' Refunded';
-  document.getElementById('pillTerminatedFS').textContent       = f.terminated + ' Terminated';
-  document.getElementById('pillCancelledRF').textContent        = r.cancelled  + ' Cancelled';
-  document.getElementById('pillRefundedRF').textContent         = r.refunded   + ' Refunded';
-  document.getElementById('pillTerminatedRF').textContent       = r.terminated + ' Terminated';
-
-  document.getElementById('ftCancelledCombined').textContent  = c.cancelled;
-  document.getElementById('ftRefundedCombined').textContent   = c.refunded;
-  document.getElementById('ftTerminatedCombined').textContent = c.terminated;
-  document.getElementById('ftTotalCombined').textContent      = c.cancelled + c.refunded + c.terminated;
-  document.getElementById('ftCancelledFS').textContent  = f.cancelled;
-  document.getElementById('ftRefundedFS').textContent   = f.refunded;
-  document.getElementById('ftTerminatedFS').textContent = f.terminated;
-  document.getElementById('ftTotalFS').textContent      = f.cancelled + f.refunded + f.terminated;
-  document.getElementById('ftCancelledRF').textContent  = r.cancelled;
-  document.getElementById('ftRefundedRF').textContent   = r.refunded;
-  document.getElementById('ftTerminatedRF').textContent = r.terminated;
-  document.getElementById('ftTotalRF').textContent      = r.cancelled + r.refunded + r.terminated;
-
-  statusChart.data.datasets[0].data = [c.cancelled, c.refunded, c.terminated];
-  statusChart.update();
-
-  planChart.data.datasets[0].data = PLAN_DATA.map(function(d){ return Math.round(d.cancelled * ratio); });
-  planChart.data.datasets[1].data = PLAN_DATA.map(function(d){ return Math.round(d.refunded  * ratio); });
-  planChart.data.datasets[2].data = PLAN_DATA.map(function(d){ return Math.round(d.terminated* ratio); });
+  noData.style.display='none';tables.style.display='';
+  var s=stats(recs);
+  var c=s.combined,fs=s.fs,rf=s.rf;
+  document.getElementById('kpiCombined').textContent=c.can+c.ref+c.term;
+  document.getElementById('kpiFS').textContent=fs.can+fs.ref+fs.term;
+  document.getElementById('kpiRF').textContent=rf.can+rf.ref+rf.term;
+  document.getElementById('pillCanC').textContent=c.can+' Cancelled';
+  document.getElementById('pillRefC').textContent=c.ref+' Refunded';
+  document.getElementById('pillTermC').textContent=c.term+' Terminated';
+  document.getElementById('pillCanFS').textContent=fs.can+' Cancelled';
+  document.getElementById('pillRefFS').textContent=fs.ref+' Refunded';
+  document.getElementById('pillTermFS').textContent=fs.term+' Terminated';
+  document.getElementById('pillCanRF').textContent=rf.can+' Cancelled';
+  document.getElementById('pillRefRF').textContent=rf.ref+' Refunded';
+  document.getElementById('pillTermRF').textContent=rf.term+' Terminated';
+  document.getElementById('legCan').textContent='Cancelled ('+c.can+')';
+  document.getElementById('legRef').textContent='Refunded ('+c.ref+')';
+  document.getElementById('legTerm').textContent='Terminated ('+c.term+')';
+  document.getElementById('ftCanC').textContent=c.can;document.getElementById('ftRefC').textContent=c.ref;document.getElementById('ftTermC').textContent=c.term;document.getElementById('ftTotC').textContent=c.can+c.ref+c.term;
+  document.getElementById('ftCanFS').textContent=fs.can;document.getElementById('ftRefFS').textContent=fs.ref;document.getElementById('ftTermFS').textContent=fs.term;document.getElementById('ftTotFS').textContent=fs.can+fs.ref+fs.term;
+  document.getElementById('ftCanRF').textContent=rf.can;document.getElementById('ftRefRF').textContent=rf.ref;document.getElementById('ftTermRF').textContent=rf.term;document.getElementById('ftTotRF').textContent=rf.can+rf.ref+rf.term;
+  statusChart.data.datasets[0].data=[c.can,c.ref,c.term];statusChart.update();
+  var plans=Object.keys(s.plans).sort(function(a,b){var ta=s.plans[a].can+s.plans[a].ref+s.plans[a].term,tb=s.plans[b].can+s.plans[b].ref+s.plans[b].term;return tb-ta;}).slice(0,9);
+  planChart.data.labels=plans;
+  planChart.data.datasets[0].data=plans.map(function(p){return s.plans[p].can;});
+  planChart.data.datasets[1].data=plans.map(function(p){return s.plans[p].ref;});
+  planChart.data.datasets[2].data=plans.map(function(p){return s.plans[p].term;});
   planChart.update();
-
-  compChart.data.datasets[0].data = [f.cancelled, f.refunded, f.terminated];
-  compChart.data.datasets[1].data = [r.cancelled, r.refunded, r.terminated];
+  compChart.data.datasets[0].data=[fs.can,fs.ref,fs.term];
+  compChart.data.datasets[1].data=[rf.can,rf.ref,rf.term];
   compChart.update();
-
-  document.getElementById('legendCancelled').textContent = 'Cancelled (' + c.cancelled + ')';
-  document.getElementById('legendRefunded').textContent  = 'Refunded ('  + c.refunded  + ')';
-  document.getElementById('legendTerminated').textContent= 'Terminated (' + c.terminated + ')';
-
-  var label = formatPeriod(from, to);
-  document.getElementById('periodLabel').innerHTML = 'Showing: <span>' + label + '</span>';
-  document.getElementById('footerPeriod').textContent = label;
+  buildTable('tbodyCombined',s.plans,null);
+  buildTable('tbodyFS',s.plans,'fs');
+  buildTable('tbodyRF',s.plans,'rf');
+  var lbl=fmtPeriod(from,to);
+  document.getElementById('periodLabel').innerHTML='Showing: <span>'+lbl+'</span>';
+  document.getElementById('footerPeriod').textContent=lbl;
 }
 
-function resetDateRange() {
-  document.getElementById('dateFrom').value = FULL_START;
-  document.getElementById('dateTo').value   = FULL_END;
+function applyDateRange(){
+  var from=document.getElementById('dateFrom').value;
+  var to=document.getElementById('dateTo').value;
+  if(!from||!to||from>to){alert('Please select a valid date range.');return;}
+  var recs=filterRecs(from,to);
+  updateDashboard(recs,from,to);
+}
+
+function resetDateRange(){
+  document.getElementById('dateFrom').value='2026-05-01';
+  document.getElementById('dateTo').value='2026-06-30';
   applyDateRange();
 }
 
 initCharts();
+applyDateRange();
 </script>
 </body>
 </html>
